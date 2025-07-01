@@ -1,4 +1,10 @@
-# System Architecture Document: Task Manager с аналитикой и интеграциями
+# System Architecture Document: Task Manager с аналитикой и интеграциями <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
+
+**Дата:** 2025-07-01
+**Версия:** 0.1v
+**Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
+
+**Ссылка на Vision & Scope Document:** [VISION_AND_SCOPE.md](./VISION_AND_SCOPE.md)
 
 ## 1. Схема архитектуры системы
 
@@ -36,17 +42,19 @@ flowchart TD
 - **Фреймворк:** React (TypeScript) - для создания интерактивного и модульного пользовательского интерфейса. TypeScript обеспечивает статическую типизацию, что повышает надежность и упрощает отладку.
 - **UI Library:** Tailwind CSS - для быстрой и гибкой стилизации компонентов с использованием utility-first подхода. Рассмотрите использование библиотеки компонентов, например, Material UI или Ant Design, для ускорения разработки и обеспечения консистентного внешнего вида.
 - **Графики:** Chart.js - для визуализации данных и создания графиков для дашбордов.
-- **State Management:** Redux Toolkit (или Zustand, Recoil) - для управления состоянием приложения.
+- **State Management:** Zustand - для управления состоянием приложения (более простой и легковесный, чем Redux Toolkit).
 - **HTTP Client:** Axios или Fetch API - для выполнения HTTP-запросов к бэкенду.
+- **UI Component Documentation:** Storybook - для документирования UI-компонентов и создания living style guide.
 
 ### 2.2. API Gateway
 
-- **Технологии:** Nginx или Traefik (опционально на этапе MVP, Django может отдавать статику).
+- **Технологии:** Django (может отдавать статику).
 - **Функциональность:**
   - Маршрутизация запросов к бэкенду.
   - Аутентификация и авторизация (проверка JWT-токенов).
   - Ограничение скорости запросов (Rate Limiting) для защиты от атак.
-  - Кэширование статического контента.
+  - CORS policies (ограничение доменов для фронтенда).
+  - CSRF protection (используется "из коробки" Django REST Framework).
 
 ### 2.3. Backend (Django REST Framework)
 
@@ -54,15 +62,17 @@ flowchart TD
 - **Асинхронные задачи:** Celery - для выполнения асинхронных задач (например, отправка уведомлений) в фоновом режиме. Redis используется в качестве брокера сообщений для Celery.
 - **Аутентификация:** JWT (JSON Web Tokens) - для безопасной аутентификации пользователей.
 - **Сериализация:** Django REST Framework Serializers - для преобразования данных между форматами JSON и Python.
+- **API Documentation:** OpenAPI (Swagger) - для документирования API и упрощения тестирования.
 
 ### 2.4. Database (PostgreSQL)
 
 - **Технологии:** PostgreSQL - надежная и масштабируемая реляционная база данных.
+- **Индексы:** Добавлены индексы для часто запрашиваемых полей (например, user_id в таблице tasks) для повышения производительности запросов.
 - **Схема данных (пример):**
-  - users: id, username, email, password, is_active, is_staff, date_joined.
-  - tasks: id, user_id, title, description, priority, deadline, status, created_at, updated_at.
-  - tags: id, name.
-  - task_tags: task_id, tag_id.
+  - **users:** id, username, email, password, is_active, is_staff, date_joined.
+  - **tasks:** id, user_id, title, description, priority, deadline, status, created_at, updated_at.
+  - **tags:** id, name.
+  - **task_tags:** task_id, tag_id.
 
 ### 2.5. Redis (Cache/Queue)
 
@@ -71,18 +81,20 @@ flowchart TD
   - Кэширование данных для дашбордов и часто запрашиваемых ресурсов.
   - Брокер сообщений для Celery (очередь задач).
   - Хранение сессий пользователей (опционально).
+  - Кэширование токенов Google Calendar API.
 
 ### 2.6. Telegram Bot API
 
-- **Технологии:** Python, python-telegram-bot или aiogram.
+- **Технологии:** Python, aiogram - асинхронная библиотека для создания Telegram ботов.
 - **Функциональность:** Отправка уведомлений пользователям о новых задачах, приближающихся дедлайнах и изменении статуса задач. Используйте Telegram Bot API для взаимодействия с ботом.
 
 ### 2.7. Google Calendar API
 
 - **Технологии:** Python, Google API Client Library.
 - **Функциональность:** Синхронизация дедлайнов задач с Google Calendar пользователя. Требует OAuth 2.0 для аутентификации и авторизации.
+- **Кэширование токенов:** Кэширование токенов Google Calendar API в Redis для снижения нагрузки на API и ускорения работы.
 
-## 3. API Endpoints (примеры)
+### 3. API Endpoints (примеры)
 
 ### 3.1. Tasks
 
@@ -107,15 +119,22 @@ flowchart TD
 
 - **POST /api/telegram/webhook/:** Обработка входящих сообщений от Telegram Bot (используется для интеграции с ботом).
 
-## 4. Безопасность
+### 4. Безопасность
 
 - Все API endpoints должны быть защищены JWT-аутентификацией (кроме endpoints для регистрации и логина).
 - Использовать HTTPS для всех соединений.
 - Валидировать входные данные для предотвращения атак типа SQL Injection и Cross-Site Scripting (XSS).
 - Регулярно обновлять зависимости для устранения известных уязвимостей.
 - Rate limiting для защиты от DoS-атак.
+- CORS policies (ограничение доменов для фронтенда).
+- CSRF protection (используется "из коробки" Django REST Framework).
 
-## 5. Дальнейшие шаги
+### 5. Деплой
+
+- **Локально:** docker-compose up (PostgreSQL + Redis + Django).
+- **Production:** Docker + Kubernetes (AWS/GCP) - [Пример: deployment.yaml, service.yaml].
+
+### 6. Дальнейшие шаги
 
 - Спроектировать схему базы данных: Определить таблицы, поля, типы данных, ключи и связи между таблицами.
 - Определить API endpoints: Полностью описать все API endpoints, включая методы, параметры запросов, форматы данных и коды ответов.
