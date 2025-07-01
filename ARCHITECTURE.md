@@ -4,7 +4,7 @@
 **Версия:** 0.1v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
-**Ссылка на Vision & Scope Document:** [VISION_AND_SCOPE.md](./VISION_AND_SCOPE.md)
+**Ссылка на подробности vision & scope системы:** [VISION_AND_SCOPE.md](./VISION_AND_SCOPE.md)
 
 ## 1. Схема архитектуры системы
 
@@ -13,7 +13,7 @@ flowchart TD
     A("Frontend <br> (React/TS)") -- "HTTP" --> B("API Gateway")
     B -- "HTTP" --> C{"Backend <br> (Django REST Framework)"}
     C -- "ORM" --> D[("PostgreSQL <br> (основная БД)")]
-    C -- "Celery" --> E[("Redis <br> (кеш/очереди)")]
+    C -- "Celery" --> E[("Redis <br> (кеш/брокер сообщений)")]
     C -- "API" --> F("Telegram Bot (уведомления)")
     C -- "API" --> G("Google Calendar (синхронизация дедлайнов)")
 
@@ -62,7 +62,7 @@ flowchart TD
 - **Асинхронные задачи:** Celery - для выполнения асинхронных задач (например, отправка уведомлений) в фоновом режиме. Redis используется в качестве брокера сообщений для Celery.
 - **Аутентификация:** JWT (JSON Web Tokens) - для безопасной аутентификации пользователей.
 - **Сериализация:** Django REST Framework Serializers - для преобразования данных между форматами JSON и Python.
-- **API Documentation:** OpenAPI (Swagger) - для документирования API и упрощения тестирования.
+- **API Documentation:** OpenAPI (Swagger/ReDoc) - для документирования API и автоматической генерации клиентских библиотек.
 
 ### 2.4. Database (PostgreSQL)
 
@@ -74,7 +74,7 @@ flowchart TD
   - **tags:** id, name.
   - **task_tags:** task_id, tag_id.
 
-### 2.5. Redis (Cache/Queue)
+### 2.5. Redis (Cache/Message Broker)
 
 - **Технологии:** Redis - быстрый in-memory data store.
 - **Использование:**
@@ -85,14 +85,16 @@ flowchart TD
 
 ### 2.6. Telegram Bot API
 
-- **Технологии:** Python, aiogram - асинхронная библиотека для создания Telegram ботов.
-- **Функциональность:** Отправка уведомлений пользователям о новых задачах, приближающихся дедлайнах и изменении статуса задач. Используйте Telegram Bot API для взаимодействия с ботом.
+- **Технологии:** aiogram - асинхронная библиотека для создания Telegram ботов (может быть заменена на telegram-bot-api).
+- **Функциональность:** Отправка уведомлений пользователям о новых задачах, приближающихся дедлайнах и изменении статуса задач.
+- **Обработка ошибок:** В случае ошибки отправки уведомления (например, из-за лимитов API) - повторные попытки отправки с экспоненциальной задержкой (exponential backoff) и логирование ошибок.
 
 ### 2.7. Google Calendar API
 
-- **Технологии:** Python, Google API Client Library.
+- **Технологии:** Google API Client Library.
 - **Функциональность:** Синхронизация дедлайнов задач с Google Calendar пользователя. Требует OAuth 2.0 для аутентификации и авторизации.
 - **Кэширование токенов:** Кэширование токенов Google Calendar API в Redis для снижения нагрузки на API и ускорения работы.
+- **Обработка недоступности API:** В случае недоступности Google Calendar API - кэшировать запросы и повторить синхронизацию через 5 минут.
 
 ### 3. API Endpoints (примеры)
 
@@ -132,12 +134,48 @@ flowchart TD
 ### 5. Деплой
 
 - **Локально:** docker-compose up (PostgreSQL + Redis + Django).
+```yaml
+version: "3.9"
+services:
+ db:
+  image: postgres:14
+  volumes:
+   - db_data:/var/lib/postgresql/data/
+  environment:
+   POSTGRES_USER: postgres
+   POSTGRES_PASSWORD: postgres
+   POSTGRES_DB: postgres
+  ports:
+   - "5432:5432"
+
+ redis:
+  image: redis:7
+  ports:
+   - "6379:6379"
+
+ backend:
+  build: ./backend
+  command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+  volumes:
+   - ./backend:/app
+  ports:
+   - "8000:8000"
+  depends_on:
+   - db
+   - redis
+  environment:
+   DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+   REDIS_URL: redis://redis:6379/0
+
+volumes:
+ db_data:
+```
 - **Production:** Docker + Kubernetes (AWS/GCP) - [Пример: deployment.yaml, service.yaml].
 
 ### 6. Дальнейшие шаги
 
-- Спроектировать схему базы данных: Определить таблицы, поля, типы данных, ключи и связи между таблицами.
-- Определить API endpoints: Полностью описать все API endpoints, включая методы, параметры запросов, форматы данных и коды ответов.
-- Разработать план реализации: Разбить проект на небольшие задачи и определить порядок их выполнения.
-- Настроить окружение разработки: Установить необходимые инструменты и библиотеки.
-- Начать разработку Frontend и Backend.
+- **Спроектировать схему базы данных:** Определить таблицы, поля, типы данных, ключи и связи между таблицами. (❌В РАЗРАБОТКЕ: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md))
+- **Определить API endpoints:** Полностью описать все API endpoints, включая методы, параметры запросов, форматы данных и коды ответов. (❌В РАЗРАБОТКЕ: [API_ENDPOINTS.md](./API_ENDPOINTS.md))
+- **Разработать план реализации:** Разбить проект на небольшие задачи и определить порядок их выполнения. (❌В РАЗРАБОТКЕ: [PLAN_OF_IMPLEMENTATION.md](./PLAN_OF_IMPLEMENTATION.md))
+- **Настроить окружение разработки:** Установить необходимые инструменты и библиотеки. (❌В РАЗРАБОТКЕ: [SETUP_ENVIRONMENT.md](./SETUP_ENVIRONMENT.md))
+- **Начать разработку Frontend и Backend.** (❌В РАЗРАБОТКЕ)
