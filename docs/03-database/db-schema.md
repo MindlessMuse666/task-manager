@@ -1,17 +1,15 @@
-# Database Schema Document: Task Manager с аналитикой и интеграциями <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
+# Database Schema | Схема Базы Данных <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
 
 **Дата:** 2025-07-02
-**Версия:** 0.3v
+**Версия:** 0.4v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
-> *Связанные документы:*
-> 1. [Vision & Scope системы](./VISION_AND_SCOPE.md "Документ: Vision & Scope системы")
-> 2. [Архитектура системы](./ARCHITECTURE.md "Документ: архитектура системы")
+> _Связанные документы:_
+>
+> 1. [Vision & Scope системы](../01-business/vision-and-scope.md "Документ: Vision & Scope системы")
+> 2. [Архитектура системы](../02-architecture/architecture.md "Документ: архитектура системы")
 
-**Ссылка на подробности vision & scope системы:** [VISION_AND_SCOPE.md](./VISION_AND_SCOPE.md)
-**Ссылка на подробности архитектуры системы:** [ARCHITECTURE.md](./ARCHITECTURE.md)
-
-## 1. ER-диаграмма
+## 1. ERD (Диаграмма сущностей-связей)
 
 ```mermaid
 ---
@@ -67,19 +65,19 @@ erDiagram
 
 ### 2.1. users (хранения информации о пользователях)
 
-<img src="./public/images/erd/users.png" alt="users" width="100%">
+<img src="/public/images/db_tables/users.png" alt="users" width="100%">
 
 ### 2.2. tasks (хранения информации о задачах)
 
-<img src="./public/images/erd/tasks.png" alt="tasks" width="100%">
+<img src="/public/images/db_tables/tasks.png" alt="tasks" width="100%">
 
 ### 2.3. tags (хранения информации о тегах)
 
-<img src="./public/images/erd/tags.png" alt="tags" width="100%">
+<img src="/public/images/db_tables/tags.png" alt="tags" width="100%">
 
 ### 2.4. task_tags (связь между задачами и тегами)
 
-<img src="./public/images/erd/task_tags.png" alt="tags" width="100%">
+<img src="/public/images/db_tables/task_tags.png" alt="tags" width="100%">
 
 ## 3. Миграции (Alembic для Django)
 
@@ -87,10 +85,8 @@ erDiagram
 
 ```python
 # migrations/versions/xxxx_initial.py
-
 from alembic import op
 import sqlalchemy as sa
-
 
 def upgrade():
     op.create_table(
@@ -103,7 +99,6 @@ def upgrade():
         sa.Column('is_staff', sa.Boolean, nullable=False, default=False),
         sa.Column('date_joined', sa.DateTime(), nullable=False),
     )
-
 
 op.create_table(
     'tasks',
@@ -136,7 +131,6 @@ op.create_table(
     sa.Column('tag_id', sa.Integer, sa.ForeignKey('tags.id'), nullable=False),
 )
 
-
 def downgrade():
     op.drop_table('task_tags')
     op.drop_table('tags')
@@ -148,15 +142,12 @@ def downgrade():
 
 ```python
 # migrations/versions/zzzz_add_indexes.py
-
 from alembic import op
 import sqlalchemy as sa
-
 
 def upgrade():
     op.create_index('ix_tasks_user_id', 'tasks', ['user_id'])
     op.create_index('ix_tasks_status', 'tasks', ['status'])
-
 
 def downgrade():
     op.drop_index('ix_tasks_user_id', 'tasks')
@@ -176,6 +167,48 @@ def downgrade():
 
 - В реальном проекте Alembic конфигурируется через настройки Django, а не напрямую. Используйте библиотеку django-alembic.
 - Примеры миграций упрощены для наглядности.
+
+### 3.6. SQL-дамп для инициализации БД (PostgreSQL)
+
+```sql
+-- SQL-дамп для инициализации структуры БД Task Manager
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(128) NOT NULL UNIQUE,
+    email VARCHAR(254) NOT NULL UNIQUE,
+    password VARCHAR(128) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_staff BOOLEAN NOT NULL DEFAULT FALSE,
+    date_joined TIMESTAMP NOT NULL
+);
+
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    title VARCHAR(200) NOT NULL,
+    description VARCHAR(1024),
+    priority VARCHAR(10) NOT NULL DEFAULT 'Medium',
+    deadline TIMESTAMP,
+    status VARCHAR(20) NOT NULL DEFAULT 'New',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE task_tags (
+    id SERIAL PRIMARY KEY,
+    task_id INTEGER NOT NULL REFERENCES tasks(id),
+    tag_id INTEGER NOT NULL REFERENCES tags(id)
+);
+
+-- Индексы для ускорения запросов
+CREATE INDEX ix_tasks_user_id ON tasks(user_id);
+CREATE INDEX ix_tasks_status ON tasks(status);
+```
 
 ## 4. Рекомендации
 
