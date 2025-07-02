@@ -1,13 +1,30 @@
 # Database Schema | Схема Базы Данных <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
 
 **Дата:** 2025-07-02
-**Версия:** 0.4v
+**Версия:** 0.5v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
 > _Связанные документы:_
 >
 > 1. [Vision & Scope системы](../01-business/vision-and-scope.md "Документ: Vision & Scope системы")
 > 2. [Архитектура системы](../02-architecture/architecture.md "Документ: архитектура системы")
+
+---
+
+## Описание
+
+Данный документ содержит описание структуры базы данных для системы Task Manager, включая ER-диаграмму, описание таблиц, примеры миграций и SQL-дамп для инициализации. Документ предназначен для системных аналитиков, архитекторов и разработчиков.
+
+---
+
+## Оглавление
+1. [ERD (Диаграмма сущностей-связей)](#1-erd-диаграмма-сущностей-связей)
+2. [Описание таблиц](#2-описание-таблиц)
+3. [Миграции (Alembic)](#3-миграции-alembic)
+4. [SQL-дамп для инициализации БД](#4-sql-дамп-для-инициализации-бд)
+5. [Рекомендации](#5-рекомендации)
+
+---
 
 ## 1. ERD (Диаграмма сущностей-связей)
 
@@ -61,27 +78,31 @@ erDiagram
   classDef default stroke-width:2px;
 ```
 
+---
+
 ## 2. Описание таблиц
 
-### 2.1. users (хранения информации о пользователях)
+### 2.1. users — Хранение информации о пользователях
 
 <img src="/public/images/db_tables/users.png" alt="users" width="100%">
 
-### 2.2. tasks (хранения информации о задачах)
+### 2.2. tasks — Хранение информации о задачах
 
 <img src="/public/images/db_tables/tasks.png" alt="tasks" width="100%">
 
-### 2.3. tags (хранения информации о тегах)
+### 2.3. tags — Хранение информации о тегах
 
 <img src="/public/images/db_tables/tags.png" alt="tags" width="100%">
 
-### 2.4. task_tags (связь между задачами и тегами)
+### 2.4. task_tags — Связь между задачами и тегами
 
 <img src="/public/images/db_tables/task_tags.png" alt="tags" width="100%">
 
-## 3. Миграции (Alembic для Django)
+---
 
-### 3.1. Инициализация (пример создания таблиц)
+## 3. Миграции (Alembic)
+
+### 3.1. Пример создания таблиц
 
 ```python
 # migrations/versions/xxxx_initial.py
@@ -100,36 +121,31 @@ def upgrade():
         sa.Column('date_joined', sa.DateTime(), nullable=False),
     )
 
-op.create_table(
-    'tasks',
-    sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('user_id', sa.Integer, sa.ForeignKey(
-        'users.id'), nullable=False),
-    sa.Column('title', sa.String(200), nullable=False),
-    sa.Column('description', sa.String(1024)),
-    sa.Column('priority', sa.String(10),
-              nullable=False, server_default='Medium'),
-    sa.Column('deadline', sa.DateTime),
-    sa.Column('status', sa.String(20), nullable=False, server_default='New'),
-    sa.Column('created_at', sa.DateTime(),
-              server_default=sa.func.now(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.func.now(),
-              onupdate=sa.func.now(), nullable=False),
-)
+    op.create_table(
+        'tasks',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('user_id', sa.Integer, sa.ForeignKey('users.id'), nullable=False),
+        sa.Column('title', sa.String(200), nullable=False),
+        sa.Column('description', sa.String(1024)),
+        sa.Column('priority', sa.String(10), nullable=False, server_default='Medium'),
+        sa.Column('deadline', sa.DateTime),
+        sa.Column('status', sa.String(20), nullable=False, server_default='New'),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
+    )
 
-op.create_table(
-    'tags',
-    sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('name', sa.String(100), nullable=False, unique=True),
-)
+    op.create_table(
+        'tags',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('name', sa.String(100), nullable=False, unique=True),
+    )
 
-op.create_table(
-    'task_tags',
-    sa.Column('id', sa.Integer, primary_key=True),
-    sa.Column('task_id', sa.Integer, sa.ForeignKey(
-        'tasks.id'), nullable=False),
-    sa.Column('tag_id', sa.Integer, sa.ForeignKey('tags.id'), nullable=False),
-)
+    op.create_table(
+        'task_tags',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('task_id', sa.Integer, sa.ForeignKey('tasks.id'), nullable=False),
+        sa.Column('tag_id', sa.Integer, sa.ForeignKey('tags.id'), nullable=False),
+    )
 
 def downgrade():
     op.drop_table('task_tags')
@@ -138,7 +154,7 @@ def downgrade():
     op.drop_table('users')
 ```
 
-### 3.2. Добавление индексов (пример)
+### 3.2. Пример добавления индексов
 
 ```python
 # migrations/versions/zzzz_add_indexes.py
@@ -154,7 +170,7 @@ def downgrade():
     op.drop_index('ix_tasks_status', 'tasks')
 ```
 
-### 3.4. Как использовать Alembic
+### 3.3. Как использовать Alembic
 
 1. **Установите Alembic:** `pip install alembic`
 2. **Сконфигурируйте Alembic:** `alembic init migrations`
@@ -163,12 +179,11 @@ def downgrade():
 5. **Примените миграции:** `alembic upgrade head`
 6. **Откатите миграции:** `alembic downgrade base`
 
-### 3.5. Примечания
+> В реальном проекте Alembic конфигурируется через настройки Django, а не напрямую. Используйте библиотеку django-alembic.
 
-- В реальном проекте Alembic конфигурируется через настройки Django, а не напрямую. Используйте библиотеку django-alembic.
-- Примеры миграций упрощены для наглядности.
+---
 
-### 3.6. SQL-дамп для инициализации БД (PostgreSQL)
+## 4. SQL-дамп для инициализации БД
 
 ```sql
 -- SQL-дамп для инициализации структуры БД Task Manager
@@ -210,7 +225,9 @@ CREATE INDEX ix_tasks_user_id ON tasks(user_id);
 CREATE INDEX ix_tasks_status ON tasks(status);
 ```
 
-## 4. Рекомендации
+---
+
+## 5. Рекомендации
 
 - Используйте Alembic для миграций, а не Django ORM.
 - Создавайте миграции для каждого изменения в схеме базы данных.

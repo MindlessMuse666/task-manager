@@ -1,18 +1,27 @@
 # User Stories | Пользовательские истории <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
 
 **Дата:** 2025-07-02
-**Версия:** 0.4v
+**Версия:** 0.5v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
 > _Связанные документы:_
 >
 > 1. [Vision & Scope системы](../01-business/vision-and-scope.md "Документ: Vision & Scope системы")
 
-## 1. Описание
+---
 
-Данный документ содержит пользовательские истории (User Stories) для системы Task Manager. User Stories сгруппированы по ролям: Пользователь и Администратор. Для каждой истории приведены критерии приёмки (Acceptance Criteria), что позволяет использовать их для тестирования и валидации требований.
+## Описание
 
-## 2. User Stories
+Документ содержит пользовательские истории (User Stories) для Task Manager, сгруппированные по ролям. Для каждой истории приведены критерии приёмки (Acceptance Criteria). Предназначен для аналитиков, архитекторов и разработчиков.
+
+---
+
+## Оглавление
+1. [User Stories](#1-user-stories)
+
+---
+
+## 1. User Stories
 
 ### Пользователь
 

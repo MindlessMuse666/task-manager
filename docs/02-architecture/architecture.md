@@ -1,12 +1,29 @@
 # System Architecture Document: Task Manager с аналитикой и интеграциями <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
 
 **Дата:** 2025-07-02
-**Версия:** 0.4v
+**Версия:** 0.5v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
 > *Связанные документы:*
-> 1. [Vision & Scope системы](../01-business/vision-and-scope.md "Документ: Vision & Scope системы")
-> 2. [Схема основной базы данных](../03-database/db-schema.md "Документ: схема основной базы данных")
+
+> 1. [Схема основной базы данных](../03-database/db-schema.md "Документ: схема основной базы данных")
+
+---
+
+## Описание
+
+Документ описывает архитектуру системы Task Manager: компоненты, взаимодействие, технологии, безопасность и этапы деплоя. Предназначен для архитекторов, аналитиков и разработчиков.
+
+---
+
+## Оглавление
+1. [Схема архитектуры системы](#1-схема-архитектуры-системы)
+2. [Описание компонентов и технологий](#2-описание-компонентов-и-технологий)
+3. [API Endpoints (примеры)](#3-api-endpoints-примеры)
+4. [Безопасность](#4-безопасность)
+5. [Деплой](#5-деплой)
+
+---
 
 ## 1. Схема архитектуры системы
 
@@ -135,49 +152,10 @@ flowchart TD
 
 ### 5. Деплой
 
-- **Локально:** docker-compose up (PostgreSQL + Redis + Django).
-```yaml
-version: "3.9"
-services:
- db:
-  image: postgres:14
-  volumes:
-   - db_data:/var/lib/postgresql/data/
-  environment:
-   POSTGRES_USER: postgres
-   POSTGRES_PASSWORD: postgres
-   POSTGRES_DB: postgres
-  ports:
-   - "5432:5432"
+- **Локально:** 
+  - Развернуть docker-контейнер (PostgreSQL + Redis + Django) с помощью Docker Desktop или команды `docker-compose up` 
+  - Пример файла docker-compose см. здесь: [docker-compose.yml](./docker-compose.yml)
 
- redis:
-  image: redis:7
-  ports:
-   - "6379:6379"
-
- backend:
-  build: ./backend
-  command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-  volumes:
-   - ./backend:/app
-  ports:
-   - "8000:8000"
-  depends_on:
-   - db
-   - redis
-  environment:
-   DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
-   REDIS_URL: redis://redis:6379/0
-
-volumes:
- db_data:
-```
-- **Production:** Docker + Kubernetes (AWS/GCP) - [Пример: deployment.yaml, service.yaml].
-
-### 6. Дальнейшие шаги
-
-- **Спроектировать схему базы данных:** Определить таблицы, поля, типы данных, ключи и связи между таблицами. (❌В РАЗРАБОТКЕ: [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md))
-- **Определить API endpoints:** Полностью описать все API endpoints, включая методы, параметры запросов, форматы данных и коды ответов. (❌В РАЗРАБОТКЕ: [API_ENDPOINTS.md](./API_ENDPOINTS.md))
-- **Разработать план реализации:** Разбить проект на небольшие задачи и определить порядок их выполнения. (❌В РАЗРАБОТКЕ: [PLAN_OF_IMPLEMENTATION.md](./PLAN_OF_IMPLEMENTATION.md))
-- **Настроить окружение разработки:** Установить необходимые инструменты и библиотеки. (❌В РАЗРАБОТКЕ: [SETUP_ENVIRONMENT.md](./SETUP_ENVIRONMENT.md))
-- **Начать разработку Frontend и Backend.** (❌В РАЗРАБОТКЕ)
+- **Production:**
+  - Docker
+  - Kubernetes (AWS/GCP)
