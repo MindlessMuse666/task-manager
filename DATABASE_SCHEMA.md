@@ -1,4 +1,15 @@
-# Database Schema: Task Manager
+# Database Schema Document: Task Manager с аналитикой и интеграциями <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
+
+**Дата:** 2025-07-02
+**Версия:** 0.3v
+**Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
+
+> *Связанные документы:*
+> 1. [Vision & Scope системы](./VISION_AND_SCOPE.md "Документ: Vision & Scope системы")
+> 2. [Архитектура системы](./ARCHITECTURE.md "Документ: архитектура системы")
+
+**Ссылка на подробности vision & scope системы:** [VISION_AND_SCOPE.md](./VISION_AND_SCOPE.md)
+**Ссылка на подробности архитектуры системы:** [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ## 1. ER-диаграмма
 

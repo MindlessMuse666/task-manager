@@ -1,10 +1,12 @@
 # Vision & Scope Document: Task Manager с аналитикой и интеграциями <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT-License image"></a>
 
-**Дата:** 2025-07-01
+**Дата:** 2025-07-02
 **Версия:** 0.3v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
-**Ссылка на подробности архитектуры системы:** [ARCHITECTURE.md](./ARCHITECTURE.md)
+> *Связанные документы:*
+> 1. [Архитектура системы](./ARCHITECTURE.md "Документ: архитектура системы")
+> 2. [Схема основной базы данных](./DATABASE_SCHEMA.md "Документ: схема основной базы данных")
 
 ## 1. Введение
 
