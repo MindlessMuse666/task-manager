@@ -5,6 +5,7 @@
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
 > *Связанные документы:*
+>
 > 1. [Архитектура системы](../02-architecture/architecture.md "Документ: архитектура системы")
 > 2. [Схема основной базы данных](../03-database/db-schema.md "Документ: схема основной базы данных")
 
@@ -25,7 +26,6 @@
 6. [Риски](#6-риски)
 7. [Глоссарий](#7-глоссарий)
 8. [Предположения и Ограничения](#8-предположения-и-ограничения-assumptions--constraints)
-9. [Дальнейшие шаги](#9-дальнейшие-шаги)
 
 ---
 
@@ -156,17 +156,3 @@
   - **aiogram** для разработки Telegram Bot (может быть заменен на **telegram-bot-api**).
   - **Google API Client Library** для разработки Google Calendar API.
   - **OpenAPI (Swagger)** для разработки API Documentation.
-
-## 9. Дальнейшие шаги
-
-- Разработка архитектуры системы. (✅ВЫПОЛНЕНО: [architecture.md](../02-architecture/architecture.md))
-- Проектирование базы данных. (✅ВЫПОЛНЕНО: [db-schema.md](../03-database/db-schema.md))
-- Настройка окружения разработки. (❌В РАЗРАБОТКЕ)
-- Разработка Frontend. (❌В РАЗРАБОТКЕ)
-- Разработка Backend. (❌В РАЗРАБОТКЕ)
-- Разработка Telegram Bot. (❌В РАЗРАБОТКЕ)
-- Разработка Google Calendar API. (❌В РАЗРАБОТКЕ)
-- Разработка API Gateway. (❌В РАЗРАБОТКЕ)
-- Разработка API Documentation. (❌В РАЗРАБОТКЕ)
-- Разработка API Endpoints. (❌В РАЗРАБОТКЕ)
-- Разработка API Tests. (❌В РАЗРАБОТКЕ)

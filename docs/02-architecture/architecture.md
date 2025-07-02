@@ -4,8 +4,8 @@
 **Версия:** 0.5v
 **Автор:** [MindlessMuse666](https://github.com/MindlessMuse666) ([Telegram](https://t.me/mindless_muse "Telegram"), [Email](mindlessmuse.666@gmail.com "Email"))
 
-> *Связанные документы:*
-
+> _Связанные документы:_
+>
 > 1. [Схема основной базы данных](../03-database/db-schema.md "Документ: схема основной базы данных")
 
 ---
@@ -17,9 +17,10 @@
 ---
 
 ## Оглавление
+
 1. [Схема архитектуры системы](#1-схема-архитектуры-системы)
 2. [Описание компонентов и технологий](#2-описание-компонентов-и-технологий)
-3. [API Endpoints (примеры)](#3-api-endpoints-примеры)
+3. [API Endpoints](./api-endpoints.md) — подробное описание всех REST API, примеры запросов и ответов, коды ошибок
 4. [Безопасность](#4-безопасность)
 5. [Деплой](#5-деплой)
 
@@ -29,29 +30,29 @@
 
 ```mermaid
 flowchart TD
-    A("Frontend <br> (React/TS)") -- "HTTP" --> B("API Gateway")
-    B -- "HTTP" --> C{"Backend <br> (Django REST Framework)"}
-    C -- "ORM" --> D[("PostgreSQL <br> (основная БД)")]
-    C -- "Celery" --> E[("Redis <br> (кеш/брокер сообщений)")]
-    C -- "API" --> F("Telegram Bot (уведомления)")
-    C -- "API" --> G("Google Calendar (синхронизация дедлайнов)")
+  A("Frontend <br> (React/TS)") -- "HTTP" --> B("API Gateway")
+  B -- "HTTP" --> C{"Backend <br> (Django REST Framework)"}
+  C -- "ORM" --> D[("PostgreSQL <br> (основная БД)")]
+  C -- "Celery" --> E[("Redis <br> (кеш/брокер сообщений)")]
+  C -- "API" --> F("Telegram Bot (уведомления)")
+  C -- "API" --> G("Google Calendar (синхронизация дедлайнов)")
 
-    classDef default stroke:#333,stroke-width:2.5px
-    classDef frontend fill:#FFC6FF
-    classDef backend fill:#BDB2FF
-    classDef gateway fill:#FFD6A5
-    classDef postgres fill:#9BF6FF
-    classDef redis fill:#FFADAD
-    classDef telegram fill:#A0C4FF
-    classDef google_calendar fill:#CAFFBF
+  classDef default stroke:#333,stroke-width:2.5px
+  classDef frontend fill:#FFC6FF
+  classDef backend fill:#BDB2FF
+  classDef gateway fill:#FFD6A5
+  classDef postgres fill:#9BF6FF
+  classDef redis fill:#FFADAD
+  classDef telegram fill:#A0C4FF
+  classDef google_calendar fill:#CAFFBF
 
-    class A frontend
-    class B gateway
-    class C backend
-    class D postgres
-    class E redis
-    class F telegram
-    class G google_calendar
+  class A frontend
+  class B gateway
+  class C backend
+  class D postgres
+  class E redis
+  class F telegram
+  class G google_calendar
 ```
 
 ## 2. Описание компонентов и технологий
@@ -115,30 +116,9 @@ flowchart TD
 - **Кэширование токенов:** Кэширование токенов Google Calendar API в Redis для снижения нагрузки на API и ускорения работы.
 - **Обработка недоступности API:** В случае недоступности Google Calendar API - кэшировать запросы и повторить синхронизацию через 5 минут.
 
-### 3. API Endpoints (примеры)
+## 3. API Endpoints
 
-### 3.1. Tasks
-
-- **GET /api/tasks/:** Получение списка задач (с возможностью фильтрации, сортировки и пагинации).
-- **POST /api/tasks/:** Создание новой задачи.
-- **GET /api/tasks/{id}/:** Получение информации о конкретной задаче.
-- **PUT /api/tasks/{id}/:** Обновление существующей задачи.
-- **DELETE /api/tasks/{id}/:** Удаление задачи.
-
-### 3.2. Users
-
-- **POST /api/users/register/:** Регистрация нового пользователя.
-- **POST /api/users/login/:** Аутентификация пользователя и получение JWT-токена.
-- **GET /api/users/me/:** Получение информации о текущем пользователе (требуется JWT-токен).
-
-### 3.3. Tags
-
-- **GET /api/tags/:** Получение списка тегов.
-- **POST /api/tags/:** Создание нового тега.
-
-### 3.4. Telegram
-
-- **POST /api/telegram/webhook/:** Обработка входящих сообщений от Telegram Bot (используется для интеграции с ботом).
+Полное описание всех REST API, примеры запросов и ответов, а также коды ошибок см. в отдельном документе: [API Endpoints](./api-endpoints.md)
 
 ### 4. Безопасность
 
@@ -152,8 +132,9 @@ flowchart TD
 
 ### 5. Деплой
 
-- **Локально:** 
-  - Развернуть docker-контейнер (PostgreSQL + Redis + Django) с помощью Docker Desktop или команды `docker-compose up` 
+- **Локально:**
+
+  - Развернуть docker-контейнер (PostgreSQL + Redis + Django) с помощью Docker Desktop или команды `docker-compose up`
   - Пример файла docker-compose см. здесь: [docker-compose.yml](./docker-compose.yml)
 
 - **Production:**
